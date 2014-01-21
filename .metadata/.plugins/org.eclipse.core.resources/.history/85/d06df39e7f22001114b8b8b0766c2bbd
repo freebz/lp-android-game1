@@ -1,0 +1,18 @@
+package com.Project3;
+
+import android.graphics.Bitmap;
+
+public class Bubble {
+
+	public int x, y, rad;
+	public Bitmap imgBall;
+	public boolean dead = false;
+	
+	private int _rad;
+	private int sx, sy;
+	private int width, height;
+	private Bitmap Bubbles[] = new Bitmap[6];
+	private int imgNum = 0;
+	private int loop = 0;
+	
+}

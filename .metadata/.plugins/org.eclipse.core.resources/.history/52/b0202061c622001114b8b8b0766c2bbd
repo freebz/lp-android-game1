@@ -1,0 +1,156 @@
+package com.Project3;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.util.AttributeSet;
+import android.view.Display;
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceView;
+import android.view.WindowManager;
+
+public class MyGameView extends SurfaceView implements Callback {
+	
+	GameThread mThread;
+	SurfaceHolder mHolder;
+	Context mContext;
+	
+	public MyGameView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		
+		SurfaceHolder holder = getHolder();
+		holder.addCallback(this);
+		mHolder = holder;
+		mContext = context;
+		mThread = new GameThread(holder, context);
+		setFocusable(true);
+	}
+
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void surfaceCreated(SurfaceHolder holder) {
+		// TODO Auto-generated method stub
+		mThread.start();
+	}
+
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		// TODO Auto-generated method stub
+		boolean done = true;
+		while (done) {
+			try {
+				mThread.join();
+				done = false;
+			} catch (InterruptedException e) {
+				
+			}
+		}
+	}
+	
+	class GameThread extends Thread {
+		SurfaceHolder mHolder;
+		Context mContext;
+		
+		int width, height;
+		Bitmap imgBack;
+		ArrayList<Bubble> mBall = new ArrayList<Bubble>();
+		ArrayList<SmallBall> sBall = new ArrayList<SmallBall>();
+		
+		public GameThread(SurfaceHolder holder, Context context) {
+			mHolder = holder;
+			mContext = context;
+			
+			Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+			width = display.getWidth();
+			height = display.getHeight() - 50;
+			
+			imgBack = BitmapFactory.decodeResource(getResources(), R.drawable.sky);
+			imgBack = Bitmap.createScaledBitmap(imgBack, width, height, false);
+		}
+		
+		public void MakeBubble(int x, int y) {
+			boolean flag = false;
+			
+			for (Bubble tmp : mBall) {
+				if (Math.pow(tmp.x - x, 2) + Math.pow(tmp.y - y, 2)
+						<= Math.pow(tmp.rad, 2)) {
+					tmp.dead = true;
+					flag = true;
+				}
+			}
+			if (flag == false)
+				mBall.add(new Bubble(mContext, x, y, width, height));
+		}
+		
+		private void MakeSmallBall(int x, int y) {
+			Random rnd = new Random();
+			int count = rnd.nextInt(9) + 7;
+			for (int i = 1; i <= count; i++) {
+				int ang = rnd.nextInt(360);
+				sBall.add(new SmallBall(mContext, x, y, ang, width, height));
+			}
+		}
+		
+		public void MoveBubble() {
+			for (int i = mBall.size() - 1; i >= 0; i--) {
+				mBall.get(i).MoveBubble();
+				if (mBall.get(i).dead) {
+					MakeSmallBall(mBall.get(i).x, mBall.get(i).y);
+					mBall.remove(i);
+				}
+			}
+			
+			for (int i = sBall.size() - 1; i >= 0; i--) {
+				sBall.get(i).MoveBall();
+				if (sBall.get(i).dead == true)
+					sBall.remove(i);
+			}
+		}
+		
+		public void run() {
+			Canvas canvas = null;
+			while (true) {
+				canvas = mHolder.lockCanvas();
+				try {
+					synchronized (mHolder) {
+						MoveBubble();
+						canvas.drawBitmap(imgBack, 0, 0, null);
+						
+						for (Bubble tmp : mBall) {
+							canvas.drawBitmap(tmp.imgBall, tmp.x - tmp.rad, tmp.y - tmp.rad, null);
+						}
+						
+						for (SmallBall tmp : sBall) {
+							canvas.drawBitmap(tmp.imgBall, tmp.x - tmp.rad, tmp.y - tmp.rad, null);
+						}
+					}
+				} finally {
+					if (canvas != null)
+						mHolder.unlockCanvasAndPost(canvas);
+				}
+			}
+		}
+	}
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			synchronized (mHolder) {
+				int x = (int) event.getX();
+				int y = (int) event.getY();
+				mThread.MakeBubble(x, y);
+			}
+		}
+		return true;
+	}
+
+}

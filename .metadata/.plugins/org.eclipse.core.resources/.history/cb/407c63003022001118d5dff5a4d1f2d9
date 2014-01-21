@@ -1,0 +1,24 @@
+package com.Project1;
+
+import SurfaceView;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+
+public class MyGameView extends SurfaceView implements Callback {
+
+	public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void surfaceCreated(SurfaceHolder arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void surfaceDestroyed(SurfaceHolder arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

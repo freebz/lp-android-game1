@@ -1,0 +1,62 @@
+package com.Project1;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.util.AttributeSet;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceView;
+
+public class MyGameView extends SurfaceView implements Callback {
+
+	public GameThread mThread;
+	
+	public MyGameView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		
+		SurfaceHolder holder = getHolder();
+		holder.addCallback(this);
+		
+		mThread = new GameThread(holder, context);
+	}
+	
+	public void surfaceCreated(SurfaceHolder holder) {
+		mThread.start();
+	}
+	
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		
+	}
+	
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	class GameThread extends Thread {
+		
+		SurfaceHolder mHolder;
+		
+		public GameThread(SurfaceHolder holder, Context context) {
+			mHolder = holder;
+		}
+		
+		public void run() {
+			Canvas canvas = null;
+			while(true) {
+				canvas = mHolder.lockCanvas();
+				try {
+					synchronized (mHolder) {
+						
+					}
+				} finally {
+					if (canvas != null)
+						mHolder.unlockCanvasAndPost(canvas);
+				}
+			}
+		}
+	}
+
+	
+
+}

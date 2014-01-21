@@ -1,0 +1,40 @@
+package com.Project3;
+
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceView;
+
+public class MyGameView extends SurfaceView implements Callback {
+	
+	GameThread mThread;
+	SurfaceHolder mHolder;
+	
+	public MyGameView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		
+		SurfaceHolder holder = getHolder();
+		holder.addCallback(this);
+		mHolder = holder;
+		mThread = new GameThread(holder, context);
+		setFocusable(true);
+	}
+
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void surfaceCreated(SurfaceHolder holder) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		// TODO Auto-generated method stub
+
+	}
+
+}
